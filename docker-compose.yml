@@ -1,0 +1,22 @@
+version: "3"
+services: 
+  mysol-api:
+    image: mysol-api:v1.0.0
+    volumes: 
+      - ../mysol:/app 
+    ports:
+      - "8081:8081"
+    expose: 
+      - "8081"
+    tty: true
+    command: ["npm", "start"]
+  mysol-app: 
+    image: mysol-app:v1.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    expose: 
+      - "8080"
+    tty: true
+    command: ["npm", "start"]
