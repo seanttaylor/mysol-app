@@ -23,7 +23,6 @@ const router = (function routerApp() {
 }());
 
 function deviceInfoApp({m, document}, router) {
-
     const URL = "http://localhost:8081/device/status";
     router.on("http://localhost:8080/device-info.html", eventData => {
         fetch(URL, {
