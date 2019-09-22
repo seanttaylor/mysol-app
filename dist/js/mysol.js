@@ -55,7 +55,7 @@ const router = (function routerApp() {
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Password Expires"),
-                        m("span", {style: {float: "right"}}, deviceInfo.timeRemainingOnDevicePassword || "No Password"),
+                        m("span", {style: {float: "right"}}, deviceInfo.timeRemainingOnDevicePassword || "N/A"),
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Battery Status"),
@@ -64,21 +64,25 @@ const router = (function routerApp() {
                 ])
             );
         }, 2500);
-        
     }
 
 }(router, window));
 
 
 (function mysolApp({rxjs}, router) {
+    const { fromEventPattern } = rxjs;
+    const source = new EventSource("http://localhost:8081/device/sse");
+    const serverSentEvent$ = fromEventPattern(handlerFn => source.onmessage = handlerFn);
+
     window.addEventListener("push", event => {
         event.preventDefault();
         router.exec(event.detail.state.url, event);
     });
 
-    const source = new EventSource("http://localhost:8081/device/sse");
-    source.onmessage = function(e) {
-        console.log(e.data);
+    function onServerEvent({ data }) {
+        console.log(data);
     }
 
+    serverSentEvent$.subscribe(onServerEvent);
+    
 }(window, router));
