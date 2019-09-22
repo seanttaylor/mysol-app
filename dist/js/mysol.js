@@ -22,7 +22,8 @@ const router = (function routerApp() {
     }
 }());
 
-(function deviceInfoApp(router, {m, document}) {
+function deviceInfoApp({m, document}, router) {
+
     const URL = "http://localhost:8081/device/status";
     router.on("http://localhost:8080/device-info.html", eventData => {
         fetch(URL, {
@@ -39,50 +40,51 @@ const router = (function routerApp() {
                 m("ul", {class: "table-view"},  [
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Name"),
-                        m("span", {style: {float: "right"}}, deviceInfo.name),
+                        m("span", {class: "card-list-item"}, deviceInfo.name),
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Model"),
-                        m("span", {style: {float: "right"}}, deviceInfo.model),
+                        m("span", {class: "card-list-item"}, deviceInfo.model),
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "App Version"),
-                        m("span", {style: {float: "right"}}, deviceInfo.applicationVersion),
+                        m("span", {class: "card-list-item"}, deviceInfo.applicationVersion),
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Status"),
-                        m("span", {style: {float: "right"}}, deviceInfo.deviceStatus.toUpperCase()),
+                        m("span", {class: "card-list-item custom-badge-primary"}, deviceInfo.deviceStatus.toUpperCase()),
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Password Expires"),
-                        m("span", {style: {float: "right"}}, deviceInfo.timeRemainingOnDevicePassword || "N/A"),
+                        m("span", {class: "card-list-item"}, deviceInfo.timeRemainingOnDevicePassword || "N/A"),
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Battery Status"),
-                        m("span", {style: {float: "right"}}, deviceInfo.batteryStatus)
+                        m("span", {class: "card-list-item"}, deviceInfo.batteryStatus)
                     ])
                 ])
             );
         }, 2500);
     }
 
-}(router, window));
+}
 
+function batteryInfoApp({ m }, router, observable$) {
+    router.on("http://localhost:8080/battery-info.html", eventData => {
+        observable$.subscribe((sse)=> console.log(sse.data));
+    });
+}
 
-(function mysolApp({rxjs}, router) {
-    const { fromEventPattern } = rxjs;
+(function mysolApp(window, router, modules) {
+    const { fromEventPattern } = window.rxjs;
     const source = new EventSource("http://localhost:8081/device/sse");
-    const serverSentEvent$ = fromEventPattern(handlerFn => source.onmessage = handlerFn);
+    const serverSentEvent$ = fromEventPattern(handlerFn => source.addEventListener("message", handlerFn));
 
     window.addEventListener("push", event => {
         event.preventDefault();
         router.exec(event.detail.state.url, event);
     });
 
-    function onServerEvent({ data }) {
-        console.log(data);
-    }
-
-    serverSentEvent$.subscribe(onServerEvent);
-    
-}(window, router));
+    //Instantiate peer modules.
+    modules.map(m=> m(window, router, serverSentEvent$));
+}(window, router, [batteryInfoApp, deviceInfoApp]));

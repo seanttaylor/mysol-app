@@ -50,3 +50,14 @@
       -webkit-transform: scaleY(1.0);
     }
   }
+
+  .card-list-item {
+    float: right;
+  }
+
+  .custom-badge-primary {
+    background-color: lightskyblue;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 4px 1px 4px;
+  }

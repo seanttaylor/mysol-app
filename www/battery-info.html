@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Battery</title>
+
+    <!-- Sets initial viewport load and disables zooming  -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+    <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Include the compiled Ratchet CSS -->
+    <link href="./css/ratchet.min.css" rel="stylesheet">
+
+    <!-- Include the compiled Ratchet JS -->
+    <script src="./js/ratchet.min.js"></script>
+  </head>
+  <body>
+    <!-- Make sure all your bars are the first things in your <body> -->
+    <header class="bar bar-nav">
+      <a class="icon icon-left-nav pull-left" href="../settings.html" data-transition="slide-out"></a>
+      <h1 class="title">Battery</h1>
+    </header>
+
+    <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
+    <div class="content">
+        <div class="card">
+            <ul class="table-view">
+                <li class="table-view-cell">
+                    <span>Charge (29%):</span>
+                    <span class="card-list-item">
+                        <meter id="battery-indicator" value=".1" low=".3" optimum=".9" high=".7"></meter>
+                    </span>
+                </li>
+                <li class="table-view-cell">
+                    Type: <span class="card-list-item">Acme Lithium Ion</span>
+                </li>
+                <li class="table-view-cell">
+                    Condition: <span class="card-list-item custom-badge-primary">OK</span>
+                </li>
+                <li class="table-view-cell">
+                    Status: <span class="card-list-item">Charging</span>
+                </li>
+                <li class="table-view-cell">
+                    Time Remaining: <span class="card-list-item">0h 0m</span>
+                </li>      
+            </ul>
+        </div>
+    </div>
+  </body>
+</html>
