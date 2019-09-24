@@ -65,17 +65,27 @@ function deviceInfoApp({m, document}, router) {
             );
         }, 2500);
     }
-
 }
 
-function batteryInfoApp({ m }, router, observable$) {
+function batteryInfoApp({rxjs, m, document }, router, observable$) {
+    const { ReplaySubject} = rxjs;
+    const rs$ = new ReplaySubject(1);
+
+    observable$.subscribe(rs$)
     router.on("http://localhost:8080/battery-info.html", eventData => {
-        observable$.subscribe((sse)=> console.log(sse.data));
+        rs$.subscribe(({data})=> {
+            const batteryData = JSON.parse(data);
+            const root = document.querySelector("#charge-percent-label");
+            const batteryIndicator = document.querySelector("#battery-indicator");
+            m.render(root, `Charge (${batteryData.payload.batteryLevel/10}%)`);
+            batteryIndicator.value = `${batteryData.payload.batteryLevel/10}` 
+        });
+        
     });
 }
 
 (function mysolApp(window, router, modules) {
-    const { fromEventPattern } = window.rxjs;
+    const { fromEventPattern, ReplaySubject } = window.rxjs;
     const source = new EventSource("http://localhost:8081/device/sse");
     const serverSentEvent$ = fromEventPattern(handlerFn => source.addEventListener("message", handlerFn));
 
