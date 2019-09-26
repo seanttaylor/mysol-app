@@ -55,6 +55,11 @@
     float: right;
   }
 
+  .panel-orientation-img {
+    display: block;
+    margin: auto
+  }
+
   .custom-badge-primary {
     background-color: lightskyblue;
     color: white;

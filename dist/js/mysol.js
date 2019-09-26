@@ -59,7 +59,7 @@ function deviceInfoApp({m, document}, router) {
                     ]),
                     m("li", {class: "table-view-cell"}, [
                         m("span", "Battery Status"),
-                        m("span", {class: "card-list-item"}, deviceInfo.batteryStatus)
+                        m("span", {class: "card-list-item"}, deviceInfo.batteryCharging ? "Charging": "Discharging")
                     ])
                 ])
             );
@@ -76,10 +76,10 @@ function batteryInfoApp({rxjs, m, document }, router, observable$) {
         
         observable$
         .pipe(map(event=> JSON.parse(event.data)))
-        .pipe(filter(event=> event.header.name.includes("battery")))
+        .pipe(filter(event=> event.header.name.includes("battery") & $("#battery-indicator") !== null))
         .subscribe((batteryData)=> {
-            m.render($("#charge-percent-label"), `Charge (${batteryData.payload.batteryLevel*10}%)`);
-            $("#battery-indicator").value = `${batteryData.payload.batteryLevel/10}`;
+            m.render($("#charge-percent-label"), `Charge (${batteryData.payload.batteryLevel*1}%)`);
+            $("#battery-indicator").value = `${batteryData.payload.batteryLevel*0.01}`;
             m.render($("#battery-status"), batteryData.batteryCharging ? "Charging" : "Discharging");
         });
     });
