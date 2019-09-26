@@ -68,19 +68,20 @@ function deviceInfoApp({m, document}, router) {
 }
 
 function batteryInfoApp({rxjs, m, document }, router, observable$) {
-    const { ReplaySubject} = rxjs;
-    const rs$ = new ReplaySubject(1);
+    const { operators } = rxjs;
+    const { filter, map } = operators;
+    const $ = document.querySelector.bind(document);
 
-    observable$.subscribe(rs$)
-    router.on("http://localhost:8080/battery-info.html", eventData => {
-        rs$.subscribe(({data})=> {
-            const batteryData = JSON.parse(data);
-            const root = document.querySelector("#charge-percent-label");
-            const batteryIndicator = document.querySelector("#battery-indicator");
-            m.render(root, `Charge (${batteryData.payload.batteryLevel/10}%)`);
-            batteryIndicator.value = `${batteryData.payload.batteryLevel/10}` 
-        });
+    router.on("http://localhost:8080/battery-info.html", (eventData) => {
         
+        observable$
+        .pipe(map(event=> JSON.parse(event.data)))
+        .pipe(filter(event=> event.header.name.includes("battery")))
+        .subscribe((batteryData)=> {
+            m.render($("#charge-percent-label"), `Charge (${batteryData.payload.batteryLevel*10}%)`);
+            $("#battery-indicator").value = `${batteryData.payload.batteryLevel/10}`;
+            m.render($("#battery-status"), batteryData.batteryCharging ? "Charging" : "Discharging");
+        });
     });
 }
 
@@ -88,6 +89,8 @@ function batteryInfoApp({rxjs, m, document }, router, observable$) {
     const { fromEventPattern, ReplaySubject } = window.rxjs;
     const source = new EventSource("http://localhost:8081/device/sse");
     const serverSentEvent$ = fromEventPattern(handlerFn => source.addEventListener("message", handlerFn));
+    const rs$ = new ReplaySubject(1);
+    serverSentEvent$.subscribe(rs$);
 
     window.addEventListener("push", event => {
         event.preventDefault();
@@ -95,5 +98,5 @@ function batteryInfoApp({rxjs, m, document }, router, observable$) {
     });
 
     //Instantiate peer modules.
-    modules.map(m=> m(window, router, serverSentEvent$));
+    modules.map(m=> m(window, router, rs$));
 }(window, router, [batteryInfoApp, deviceInfoApp]));
