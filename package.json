@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "lint": "./node_modules/.bin/eslint -c ./.eslintrc.json ./src/**/*.js ./dist/**/*.js",
-    "lint:fix": "./node_modules/.bin/eslint -c ./.eslintrc.json ./src/**/*.js ./dist/js/mysol.js --fix"
+    "start": "node index.js"
   },
   "keywords": [
     "IoT",
@@ -21,10 +19,5 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "morgan": "^1.9.1"
-  },
-  "devDependencies": {
-    "eslint": "^6.5.1",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2"
   }
 }
