@@ -16,11 +16,9 @@
  * ======================================================================== */
 
 !(function () {
-  'use strict';
-
-  var findModals = function (target) {
-    var i;
-    var modals = document.querySelectorAll('a');
+  const findModals = function (target) {
+    let i;
+    const modals = document.querySelectorAll('a');
 
     for (; target && target !== document; target = target.parentNode) {
       for (i = modals.length; i--;) {
@@ -31,15 +29,15 @@
     }
   };
 
-  var getModal = function (event) {
-    var modalToggle = findModals(event.target);
+  const getModal = function (event) {
+    const modalToggle = findModals(event.target);
     if (modalToggle && modalToggle.hash) {
       return document.querySelector(modalToggle.hash);
     }
   };
 
-  window.addEventListener('touchend', function (event) {
-    var modal = getModal(event);
+  window.addEventListener('touchend', (event) => {
+    const modal = getModal(event);
     if (modal) {
       if (modal && modal.classList.contains('modal')) {
         modal.classList.toggle('active');
@@ -58,13 +56,11 @@
  * ======================================================================== */
 
 !(function () {
-  'use strict';
+  let popover;
 
-  var popover;
-
-  var findPopovers = function (target) {
-    var i;
-    var popovers = document.querySelectorAll('a');
+  const findPopovers = function (target) {
+    let i;
+    const popovers = document.querySelectorAll('a');
 
     for (; target && target !== document; target = target.parentNode) {
       for (i = popovers.length; i--;) {
@@ -81,11 +77,11 @@
   };
 
   var backdrop = (function () {
-    var element = document.createElement('div');
+    const element = document.createElement('div');
 
     element.classList.add('backdrop');
 
-    element.addEventListener('touchend', function () {
+    element.addEventListener('touchend', () => {
       popover.addEventListener('webkitTransitionEnd', onPopoverHidden);
       popover.classList.remove('visible');
       popover.parentNode.removeChild(backdrop);
@@ -94,8 +90,8 @@
     return element;
   }());
 
-  var getPopover = function (e) {
-    var anchor = findPopovers(e.target);
+  const getPopover = function (e) {
+    const anchor = findPopovers(e.target);
 
     if (!anchor || !anchor.hash || (anchor.hash.indexOf('/') > 0)) {
       return;
@@ -103,8 +99,7 @@
 
     try {
       popover = document.querySelector(anchor.hash);
-    }
-    catch (error) {
+    } catch (error) {
       popover = null;
     }
 
@@ -119,8 +114,8 @@
     return popover;
   };
 
-  var showHidePopover = function (e) {
-    var popover = getPopover(e);
+  const showHidePopover = function (e) {
+    const popover = getPopover(e);
 
     if (!popover) {
       return;
@@ -134,7 +129,6 @@
   };
 
   window.addEventListener('touchend', showHidePopover);
-
 }());
 
 /* ========================================================================
@@ -149,32 +143,30 @@
 /* global _gaq: true */
 
 !(function () {
-  'use strict';
-
-  var noop = function () {};
+  const noop = function () {};
 
 
   // Pushstate caching
   // ==================
 
-  var isScrolling;
-  var maxCacheLength = 20;
-  var cacheMapping   = sessionStorage;
-  var domCache       = {};
-  var transitionMap  = {
-    slideIn  : 'slide-out',
-    slideOut : 'slide-in',
-    fade     : 'fade'
+  let isScrolling;
+  const maxCacheLength = 20;
+  const cacheMapping = sessionStorage;
+  const domCache = {};
+  const transitionMap = {
+    slideIn: 'slide-out',
+    slideOut: 'slide-in',
+    fade: 'fade',
   };
 
-  var bars = {
-    bartab             : '.bar-tab',
-    barnav             : '.bar-nav',
-    barfooter          : '.bar-footer',
-    barheadersecondary : '.bar-header-secondary'
+  const bars = {
+    bartab: '.bar-tab',
+    barnav: '.bar-nav',
+    barfooter: '.bar-footer',
+    barheadersecondary: '.bar-header-secondary',
   };
 
-  var cacheReplace = function (data, updates) {
+  const cacheReplace = function (data, updates) {
     PUSH.id = data.id;
     if (updates) {
       data = getCached(data.id);
@@ -184,11 +176,11 @@
     domCache[data.id] = document.body.cloneNode(true);
   };
 
-  var cachePush = function () {
-    var id = PUSH.id;
+  const cachePush = function () {
+    const { id } = PUSH;
 
-    var cacheForwardStack = JSON.parse(cacheMapping.cacheForwardStack || '[]');
-    var cacheBackStack    = JSON.parse(cacheMapping.cacheBackStack    || '[]');
+    const cacheForwardStack = JSON.parse(cacheMapping.cacheForwardStack || '[]');
+    const cacheBackStack = JSON.parse(cacheMapping.cacheBackStack || '[]');
 
     cacheBackStack.push(id);
 
@@ -202,15 +194,15 @@
     window.history.pushState(null, '', cacheMapping[PUSH.id].url);
 
     cacheMapping.cacheForwardStack = JSON.stringify(cacheForwardStack);
-    cacheMapping.cacheBackStack    = JSON.stringify(cacheBackStack);
+    cacheMapping.cacheBackStack = JSON.stringify(cacheBackStack);
   };
 
-  var cachePop = function (id, direction) {
-    var forward           = direction === 'forward';
-    var cacheForwardStack = JSON.parse(cacheMapping.cacheForwardStack || '[]');
-    var cacheBackStack    = JSON.parse(cacheMapping.cacheBackStack    || '[]');
-    var pushStack         = forward ? cacheBackStack    : cacheForwardStack;
-    var popStack          = forward ? cacheForwardStack : cacheBackStack;
+  const cachePop = function (id, direction) {
+    const forward = direction === 'forward';
+    const cacheForwardStack = JSON.parse(cacheMapping.cacheForwardStack || '[]');
+    const cacheBackStack = JSON.parse(cacheMapping.cacheBackStack || '[]');
+    const pushStack = forward ? cacheBackStack : cacheForwardStack;
+    const popStack = forward ? cacheForwardStack : cacheBackStack;
 
     if (PUSH.id) {
       pushStack.push(PUSH.id);
@@ -218,26 +210,26 @@
     popStack.pop();
 
     cacheMapping.cacheForwardStack = JSON.stringify(cacheForwardStack);
-    cacheMapping.cacheBackStack    = JSON.stringify(cacheBackStack);
+    cacheMapping.cacheBackStack = JSON.stringify(cacheBackStack);
   };
 
   var getCached = function (id) {
     return JSON.parse(cacheMapping[id] || null) || {};
   };
 
-  var getTarget = function (e) {
-    var target = findTarget(e.target);
+  const getTarget = function (e) {
+    const target = findTarget(e.target);
 
-    if (!target ||
-        e.which > 1 ||
-        e.metaKey ||
-        e.ctrlKey ||
-        isScrolling ||
-        location.protocol !== target.protocol ||
-        location.host     !== target.host ||
-        !target.hash && /#/.test(target.href) ||
-        target.hash && target.href.replace(target.hash, '') === location.href.replace(location.hash, '') ||
-        target.getAttribute('data-ignore') === 'push') { return; }
+    if (!target
+        || e.which > 1
+        || e.metaKey
+        || e.ctrlKey
+        || isScrolling
+        || location.protocol !== target.protocol
+        || location.host !== target.host
+        || !target.hash && /#/.test(target.href)
+        || target.hash && target.href.replace(target.hash, '') === location.href.replace(location.hash, '')
+        || target.getAttribute('data-ignore') === 'push') { return; }
 
     return target;
   };
@@ -246,8 +238,8 @@
   // Main event handlers (touchend, popstate)
   // ==========================================
 
-  var touchend = function (e) {
-    var target = getTarget(e);
+  const touchend = function (e) {
+    const target = getTarget(e);
 
     if (!target) {
       return;
@@ -256,23 +248,23 @@
     e.preventDefault();
 
     PUSH({
-      url        : target.href,
-      hash       : target.hash,
-      timeout    : target.getAttribute('data-timeout'),
-      transition : target.getAttribute('data-transition')
+      url: target.href,
+      hash: target.hash,
+      timeout: target.getAttribute('data-timeout'),
+      transition: target.getAttribute('data-transition'),
     });
   };
 
-  var popstate = function (e) {
-    var key;
-    var barElement;
-    var activeObj;
-    var activeDom;
-    var direction;
-    var transition;
-    var transitionFrom;
-    var transitionFromObj;
-    var id = e.state;
+  const popstate = function (e) {
+    let key;
+    let barElement;
+    let activeObj;
+    let activeDom;
+    let direction;
+    let transition;
+    let transitionFrom;
+    let transitionFromObj;
+    const id = e.state;
 
     if (!id || !cacheMapping[id]) {
       return;
@@ -290,7 +282,7 @@
     }
 
     if (direction === 'back') {
-      transitionFrom    = JSON.parse(direction === 'back' ? cacheMapping.cacheForwardStack : cacheMapping.cacheBackStack);
+      transitionFrom = JSON.parse(direction === 'back' ? cacheMapping.cacheForwardStack : cacheMapping.cacheBackStack);
       transitionFromObj = getCached(transitionFrom[transitionFrom.length - 1]);
     } else {
       transitionFromObj = activeObj;
@@ -304,12 +296,12 @@
 
     if (!activeDom) {
       return PUSH({
-        id         : activeObj.id,
-        url        : activeObj.url,
-        title      : activeObj.title,
-        timeout    : activeObj.timeout,
-        transition : transition,
-        ignorePush : true
+        id: activeObj.id,
+        url: activeObj.url,
+        title: activeObj.title,
+        timeout: activeObj.timeout,
+        transition,
+        ignorePush: true,
       });
     }
 
@@ -330,7 +322,7 @@
     swapContent(
       (activeObj.contents || activeDom).cloneNode(true),
       document.querySelector('.content'),
-      transition
+      transition,
     );
 
     PUSH.id = id;
@@ -343,8 +335,8 @@
   // =======================
 
   var PUSH = function (options) {
-    var key;
-    var xhr = PUSH.xhr;
+    let key;
+    let { xhr } = PUSH;
 
     options.container = options.container || options.transition ? document.querySelector('.content') : document.body;
 
@@ -374,16 +366,16 @@
 
     if (!PUSH.id) {
       cacheReplace({
-        id         : +new Date(),
-        url        : window.location.href,
-        title      : document.title,
-        timeout    : options.timeout,
-        transition : null
+        id: +new Date(),
+        url: window.location.href,
+        title: document.title,
+        timeout: options.timeout,
+        transition: null,
       });
     }
 
     if (options.timeout) {
-      options._timeout = setTimeout(function () {  xhr.abort('timeout'); }, options.timeout);
+      options._timeout = setTimeout(() => { xhr.abort('timeout'); }, options.timeout);
     }
 
     xhr.send();
@@ -398,9 +390,9 @@
   // =================
 
   var success = function (xhr, options) {
-    var key;
-    var barElement;
-    var data = parseXHR(xhr, options);
+    let key;
+    let barElement;
+    const data = parseXHR(xhr, options);
 
     if (!data.contents) {
       return locationReplace(options.url);
@@ -423,13 +415,13 @@
       }
     }
 
-    swapContent(data.contents, options.container, options.transition, function () {
+    swapContent(data.contents, options.container, options.transition, () => {
       cacheReplace({
-        id         : options.id || +new Date(),
-        url        : data.url,
-        title      : data.title,
-        timeout    : options.timeout,
-        transition : options.transition
+        id: options.id || +new Date(),
+        url: data.url,
+        title: data.title,
+        timeout: options.timeout,
+        transition: options.transition,
       }, options.id);
       triggerStateChange();
     });
@@ -438,12 +430,12 @@
       _gaq.push(['_trackPageview']); // google analytics
     }
     if (!options.hash) {
-      return;
+
     }
   };
 
   var failure = function (url) {
-    throw new Error('Could not get: ' + url);
+    throw new Error(`Could not get: ${url}`);
   };
 
 
@@ -451,9 +443,9 @@
   // ============
 
   var swapContent = function (swap, container, transition, complete) {
-    var enter;
-    var containerDirection;
-    var swapDirection;
+    let enter;
+    let containerDirection;
+    let swapDirection;
 
     if (!transition) {
       if (container) {
@@ -464,7 +456,7 @@
         document.body.insertBefore(swap, document.querySelector('.content'));
       }
     } else {
-      enter  = /in$/.test(transition);
+      enter = /in$/.test(transition);
 
       if (transition === 'fade') {
         container.classList.add('in');
@@ -501,7 +493,6 @@
         complete && complete();
       };
       container.addEventListener('webkitTransitionEnd', fadeContainerEnd);
-
     }
 
     if (/slide/.test(transition)) {
@@ -514,7 +505,7 @@
       };
 
       container.offsetWidth; // force reflow
-      swapDirection      = enter ? 'right' : 'left';
+      swapDirection = enter ? 'right' : 'left';
       containerDirection = enter ? 'left' : 'right';
       container.classList.add(containerDirection);
       swap.classList.remove(swapDirection);
@@ -523,18 +514,18 @@
   };
 
   var triggerStateChange = function () {
-    var e = new CustomEvent('push', {
+    const e = new CustomEvent('push', {
       detail: { state: getCached(PUSH.id) },
       bubbles: true,
-      cancelable: true
+      cancelable: true,
     });
 
     window.dispatchEvent(e);
   };
 
   var findTarget = function (target) {
-    var i;
-    var toggles = document.querySelectorAll('a');
+    let i;
+    const toggles = document.querySelectorAll('a');
 
     for (; target && target !== document; target = target.parentNode) {
       for (i = toggles.length; i--;) {
@@ -551,8 +542,8 @@
   };
 
   var extendWithDom = function (obj, fragment, dom) {
-    var i;
-    var result = {};
+    let i;
+    const result = {};
 
     for (i in obj) {
       if (obj.hasOwnProperty(i)) {
@@ -560,8 +551,8 @@
       }
     }
 
-    Object.keys(bars).forEach(function (key) {
-      var el = dom.querySelector(bars[key]);
+    Object.keys(bars).forEach((key) => {
+      const el = dom.querySelector(bars[key]);
       if (el) {
         el.parentNode.removeChild(el);
       }
@@ -574,10 +565,10 @@
   };
 
   var parseXHR = function (xhr, options) {
-    var head;
-    var body;
-    var data = {};
-    var responseText = xhr.responseText;
+    let head;
+    let body;
+    let data = {};
+    const { responseText } = xhr;
 
     data.url = options.url;
 
@@ -586,17 +577,17 @@
     }
 
     if (/<html/i.test(responseText)) {
-      head           = document.createElement('div');
-      body           = document.createElement('div');
+      head = document.createElement('div');
+      body = document.createElement('div');
       head.innerHTML = responseText.match(/<head[^>]*>([\s\S.]*)<\/head>/i)[0];
       body.innerHTML = responseText.match(/<body[^>]*>([\s\S.]*)<\/body>/i)[0];
     } else {
-      head           = body = document.createElement('div');
+      head = body = document.createElement('div');
       head.innerHTML = responseText;
     }
 
     data.title = head.querySelector('title');
-    var text = 'innerText' in data.title ? 'innerText' : 'textContent';
+    const text = 'innerText' in data.title ? 'innerText' : 'textContent';
     data.title = data.title && data.title[text].trim();
 
     if (options.transition) {
@@ -612,13 +603,12 @@
   // Attach PUSH event handlers
   // ==========================
 
-  window.addEventListener('touchstart', function () { isScrolling = false; });
-  window.addEventListener('touchmove', function () { isScrolling = true; });
+  window.addEventListener('touchstart', () => { isScrolling = false; });
+  window.addEventListener('touchmove', () => { isScrolling = true; });
   window.addEventListener('touchend', touchend);
-  window.addEventListener('click', function (e) { if (getTarget(e)) {e.preventDefault();} });
+  window.addEventListener('click', (e) => { if (getTarget(e)) { e.preventDefault(); } });
   window.addEventListener('popstate', popstate);
   window.PUSH = PUSH;
-
 }());
 
 /* ========================================================================
@@ -630,11 +620,9 @@
  * ======================================================================== */
 
 !(function () {
-  'use strict';
-
-  var getTarget = function (target) {
-    var i;
-    var segmentedControls = document.querySelectorAll('.segmented-control .control-item');
+  const getTarget = function (target) {
+    let i;
+    const segmentedControls = document.querySelectorAll('.segmented-control .control-item');
 
     for (; target && target !== document; target = target.parentNode) {
       for (i = segmentedControls.length; i--;) {
@@ -645,13 +633,13 @@
     }
   };
 
-  window.addEventListener('touchend', function (e) {
-    var activeTab;
-    var activeBodies;
-    var targetBody;
-    var targetTab     = getTarget(e.target);
-    var className     = 'active';
-    var classSelector = '.' + className;
+  window.addEventListener('touchend', (e) => {
+    let activeTab;
+    let activeBodies;
+    let targetBody;
+    const targetTab = getTarget(e.target);
+    const className = 'active';
+    const classSelector = `.${className}`;
 
     if (!targetTab) {
       return;
@@ -677,14 +665,14 @@
 
     activeBodies = targetBody.parentNode.querySelectorAll(classSelector);
 
-    for (var i = 0; i < activeBodies.length; i++) {
+    for (let i = 0; i < activeBodies.length; i++) {
       activeBodies[i].classList.remove(className);
     }
 
     targetBody.classList.add(className);
   });
 
-  window.addEventListener('click', function (e) { if (getTarget(e.target)) {e.preventDefault();} });
+  window.addEventListener('click', (e) => { if (getTarget(e.target)) { e.preventDefault(); } });
 }());
 
 /* ========================================================================
@@ -697,25 +685,23 @@
  * ======================================================================== */
 
 !(function () {
-  'use strict';
+  let pageX;
+  let pageY;
+  let slider;
+  let deltaX;
+  let deltaY;
+  let offsetX;
+  let lastSlide;
+  let startTime;
+  let resistance;
+  let sliderWidth;
+  let slideNumber;
+  let isScrolling;
+  let scrollableArea;
 
-  var pageX;
-  var pageY;
-  var slider;
-  var deltaX;
-  var deltaY;
-  var offsetX;
-  var lastSlide;
-  var startTime;
-  var resistance;
-  var sliderWidth;
-  var slideNumber;
-  var isScrolling;
-  var scrollableArea;
-
-  var getSlider = function (target) {
-    var i;
-    var sliders = document.querySelectorAll('.slider > .slide-group');
+  const getSlider = function (target) {
+    let i;
+    const sliders = document.querySelectorAll('.slider > .slide-group');
 
     for (; target && target !== document; target = target.parentNode) {
       for (i = sliders.length; i--;) {
@@ -726,56 +712,56 @@
     }
   };
 
-  var getScroll = function () {
+  const getScroll = function () {
     if ('webkitTransform' in slider.style) {
-      var translate3d = slider.style.webkitTransform.match(/translate3d\(([^,]*)/);
-      var ret = translate3d ? translate3d[1] : 0;
+      const translate3d = slider.style.webkitTransform.match(/translate3d\(([^,]*)/);
+      const ret = translate3d ? translate3d[1] : 0;
       return parseInt(ret, 10);
     }
   };
 
-  var setSlideNumber = function (offset) {
-    var round = offset ? (deltaX < 0 ? 'ceil' : 'floor') : 'round';
+  const setSlideNumber = function (offset) {
+    const round = offset ? (deltaX < 0 ? 'ceil' : 'floor') : 'round';
     slideNumber = Math[round](getScroll() / (scrollableArea / slider.children.length));
     slideNumber += offset;
     slideNumber = Math.min(slideNumber, 0);
     slideNumber = Math.max(-(slider.children.length - 1), slideNumber);
   };
 
-  var onTouchStart = function (e) {
+  const onTouchStart = function (e) {
     slider = getSlider(e.target);
 
     if (!slider) {
       return;
     }
 
-    var firstItem  = slider.querySelector('.slide');
+    const firstItem = slider.querySelector('.slide');
 
     scrollableArea = firstItem.offsetWidth * slider.children.length;
-    isScrolling    = undefined;
-    sliderWidth    = slider.offsetWidth;
-    resistance     = 1;
-    lastSlide      = -(slider.children.length - 1);
-    startTime      = +new Date();
-    pageX          = e.touches[0].pageX;
-    pageY          = e.touches[0].pageY;
-    deltaX         = 0;
-    deltaY         = 0;
+    isScrolling = undefined;
+    sliderWidth = slider.offsetWidth;
+    resistance = 1;
+    lastSlide = -(slider.children.length - 1);
+    startTime = +new Date();
+    pageX = e.touches[0].pageX;
+    pageY = e.touches[0].pageY;
+    deltaX = 0;
+    deltaY = 0;
 
     setSlideNumber(0);
 
     slider.style['-webkit-transition-duration'] = 0;
   };
 
-  var onTouchMove = function (e) {
+  const onTouchMove = function (e) {
     if (e.touches.length > 1 || !slider) {
       return; // Exit if a pinch || no slider
     }
 
     deltaX = e.touches[0].pageX - pageX;
     deltaY = e.touches[0].pageY - pageY;
-    pageX  = e.touches[0].pageX;
-    pageY  = e.touches[0].pageY;
+    pageX = e.touches[0].pageX;
+    pageY = e.touches[0].pageY;
 
     if (typeof isScrolling === 'undefined') {
       isScrolling = Math.abs(deltaY) > Math.abs(deltaX);
@@ -789,30 +775,30 @@
 
     e.preventDefault();
 
-    resistance = slideNumber === 0         && deltaX > 0 ? (pageX / sliderWidth) + 1.25 :
-                 slideNumber === lastSlide && deltaX < 0 ? (Math.abs(pageX) / sliderWidth) + 1.25 : 1;
+    resistance = slideNumber === 0 && deltaX > 0 ? (pageX / sliderWidth) + 1.25
+      : slideNumber === lastSlide && deltaX < 0 ? (Math.abs(pageX) / sliderWidth) + 1.25 : 1;
 
-    slider.style.webkitTransform = 'translate3d(' + offsetX + 'px,0,0)';
+    slider.style.webkitTransform = `translate3d(${offsetX}px,0,0)`;
   };
 
-  var onTouchEnd = function (e) {
+  const onTouchEnd = function (e) {
     if (!slider || isScrolling) {
       return;
     }
 
     setSlideNumber(
-      (+new Date()) - startTime < 1000 && Math.abs(deltaX) > 15 ? (deltaX < 0 ? -1 : 1) : 0
+      (+new Date()) - startTime < 1000 && Math.abs(deltaX) > 15 ? (deltaX < 0 ? -1 : 1) : 0,
     );
 
     offsetX = slideNumber * sliderWidth;
 
     slider.style['-webkit-transition-duration'] = '.2s';
-    slider.style.webkitTransform = 'translate3d(' + offsetX + 'px,0,0)';
+    slider.style.webkitTransform = `translate3d(${offsetX}px,0,0)`;
 
     e = new CustomEvent('slide', {
       detail: { slideNumber: Math.abs(slideNumber) },
       bubbles: true,
-      cancelable: true
+      cancelable: true,
     });
 
     slider.parentNode.dispatchEvent(e);
@@ -821,7 +807,6 @@
   window.addEventListener('touchstart', onTouchStart);
   window.addEventListener('touchmove', onTouchMove);
   window.addEventListener('touchend', onTouchEnd);
-
 }());
 
 /* ========================================================================
@@ -834,16 +819,14 @@
  * ======================================================================== */
 
 !(function () {
-  'use strict';
+  let start = {};
+  let touchMove = false;
+  let distanceX = false;
+  let toggle = false;
 
-  var start     = {};
-  var touchMove = false;
-  var distanceX = false;
-  var toggle    = false;
-
-  var findToggle = function (target) {
-    var i;
-    var toggles = document.querySelectorAll('.toggle');
+  const findToggle = function (target) {
+    let i;
+    const toggles = document.querySelectorAll('.toggle');
 
     for (; target && target !== document; target = target.parentNode) {
       for (i = toggles.length; i--;) {
@@ -854,7 +837,7 @@
     }
   };
 
-  window.addEventListener('touchstart', function (e) {
+  window.addEventListener('touchstart', (e) => {
     e = e.originalEvent || e;
 
     toggle = findToggle(e.target);
@@ -863,16 +846,16 @@
       return;
     }
 
-    var handle      = toggle.querySelector('.toggle-handle');
-    var toggleWidth = toggle.clientWidth;
-    var handleWidth = handle.clientWidth;
-    var offset      = toggle.classList.contains('active') ? (toggleWidth - handleWidth) : 0;
+    const handle = toggle.querySelector('.toggle-handle');
+    const toggleWidth = toggle.clientWidth;
+    const handleWidth = handle.clientWidth;
+    const offset = toggle.classList.contains('active') ? (toggleWidth - handleWidth) : 0;
 
-    start     = { pageX : e.touches[0].pageX - offset, pageY : e.touches[0].pageY };
+    start = { pageX: e.touches[0].pageX - offset, pageY: e.touches[0].pageY };
     touchMove = false;
   });
 
-  window.addEventListener('touchmove', function (e) {
+  window.addEventListener('touchmove', (e) => {
     e = e.originalEvent || e;
 
     if (e.touches.length > 1) {
@@ -883,11 +866,11 @@
       return;
     }
 
-    var handle      = toggle.querySelector('.toggle-handle');
-    var current     = e.touches[0];
-    var toggleWidth = toggle.clientWidth;
-    var handleWidth = handle.clientWidth;
-    var offset      = toggleWidth - handleWidth;
+    const handle = toggle.querySelector('.toggle-handle');
+    const current = e.touches[0];
+    const toggleWidth = toggle.clientWidth;
+    const handleWidth = handle.clientWidth;
+    const offset = toggleWidth - handleWidth;
 
     touchMove = true;
     distanceX = current.pageX - start.pageX;
@@ -902,27 +885,27 @@
       return (handle.style.webkitTransform = 'translate3d(0,0,0)');
     }
     if (distanceX > offset) {
-      return (handle.style.webkitTransform = 'translate3d(' + offset + 'px,0,0)');
+      return (handle.style.webkitTransform = `translate3d(${offset}px,0,0)`);
     }
 
-    handle.style.webkitTransform = 'translate3d(' + distanceX + 'px,0,0)';
+    handle.style.webkitTransform = `translate3d(${distanceX}px,0,0)`;
 
     toggle.classList[(distanceX > (toggleWidth / 2 - handleWidth / 2)) ? 'add' : 'remove']('active');
   });
 
-  window.addEventListener('touchend', function (e) {
+  window.addEventListener('touchend', (e) => {
     if (!toggle) {
       return;
     }
 
-    var handle      = toggle.querySelector('.toggle-handle');
-    var toggleWidth = toggle.clientWidth;
-    var handleWidth = handle.clientWidth;
-    var offset      = (toggleWidth - handleWidth);
-    var slideOn     = (!touchMove && !toggle.classList.contains('active')) || (touchMove && (distanceX > (toggleWidth / 2 - handleWidth / 2)));
+    const handle = toggle.querySelector('.toggle-handle');
+    const toggleWidth = toggle.clientWidth;
+    const handleWidth = handle.clientWidth;
+    const offset = (toggleWidth - handleWidth);
+    const slideOn = (!touchMove && !toggle.classList.contains('active')) || (touchMove && (distanceX > (toggleWidth / 2 - handleWidth / 2)));
 
     if (slideOn) {
-      handle.style.webkitTransform = 'translate3d(' + offset + 'px,0,0)';
+      handle.style.webkitTransform = `translate3d(${offset}px,0,0)`;
     } else {
       handle.style.webkitTransform = 'translate3d(0,0,0)';
     }
@@ -932,13 +915,12 @@
     e = new CustomEvent('toggle', {
       detail: { isActive: slideOn },
       bubbles: true,
-      cancelable: true
+      cancelable: true,
     });
 
     toggle.dispatchEvent(e);
 
     touchMove = false;
-    toggle    = false;
+    toggle = false;
   });
-
 }());
