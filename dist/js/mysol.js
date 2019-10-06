@@ -1,3 +1,8 @@
+ /**
+ * Module for managing the application view router.
+ * @returns void
+ */
+
 const router = (function routerApp() {
     const routeMap = {};
 
@@ -22,6 +27,14 @@ const router = (function routerApp() {
     }
 }());
 
+ /**
+ * Module for managing the Device Info view.
+ * @param {Object} window - The browser window object.
+ * @param {Object} window.m - The Mithril library.
+ * @param {Object} router - The application view router.
+ * @returns void
+ */
+
 function deviceInfoApp({m, document}, router) {
     const URL = "http://localhost:8081/device/status";
     router.on("http://localhost:8080/device-info.html", eventData => {
@@ -29,8 +42,15 @@ function deviceInfoApp({m, document}, router) {
             method: "GET"
         })
         .then(response=> response.json())
-        .then(onDeviceInfo);
+        .then(onDeviceInfo)
+        .catch((e)=> console.error(e));
     });
+
+    /**
+     * Fetches device metadata from the mySōl.
+     * @param {Object} deviceInfo - Information fetched form the mySōl device API.
+     * @returns void
+     */
 
     function onDeviceInfo(deviceInfo) {
         const root = document.querySelector(".card");
@@ -67,16 +87,49 @@ function deviceInfoApp({m, document}, router) {
     }
 }
 
+ /**
+ * Module for managing the Battery Info view.
+ * @param {Object} window - The browser window object.
+ * @param {Object} window.rxjs - The RxJs library.
+ * @param {Object} window.m - The Mithril library.
+ * @param {Object} router - The application view router.
+ * @param {Object} observable$ - An observable for receiving subscribed events.
+ * @returns void
+ */
+
+function telemetryInfoApp( {m, document}, router, observable$) {
+    const { operators } = rxjs;
+    const { filter } = operators;
+
+    router.on("http://localhost:8080/telemetry.html", (eventData) => {
+        observable$
+        .pipe(filter(event=> event.header.name.includes("telemetry")))
+        .subscribe((x)=> console.log(x));
+    });
+
+    function onTelemetryData(data) {
+
+    }
+
+}
+
+ /**
+ * Module for managing the Battery Info view.
+ * @param {Object} window - The browser window object.
+ * @param {Object} window.rxjs - The RxJs library.
+ * @param {Object} window.m - The Mithril library.
+ * @param {Object} router - The application view router.
+ * @param {Object} observable$ - An observable for receiving subscribed events.
+ */
+
 function batteryInfoApp({rxjs, m, document }, router, observable$) {
     const { operators } = rxjs;
     const { filter, map } = operators;
     const $ = document.querySelector.bind(document);
 
     router.on("http://localhost:8080/battery-info.html", (eventData) => {
-        
         observable$
-        .pipe(map(event=> JSON.parse(event.data)))
-        .pipe(filter(event=> event.header.name.includes("battery") & $("#battery-indicator") !== null))
+        .pipe(filter(event=> event.header.name.includes("battery") && $("#battery-indicator") !== null))
         .subscribe((batteryData)=> {
             m.render($("#charge-percent-label"), `Charge (${batteryData.payload.batteryLevel*1}%)`);
             $("#battery-indicator").value = `${batteryData.payload.batteryLevel*0.01}`;
@@ -85,12 +138,23 @@ function batteryInfoApp({rxjs, m, document }, router, observable$) {
     });
 }
 
+ /**
+ * Bootstraps the appliaction.
+ * @param {Object} window - The browser window object.
+ * @param {Object} router - The application view router.
+ * @param {Array} modules - List of application modules.
+ * @returns void
+*/
+
 (function mysolApp(window, router, modules) {
-    const { fromEventPattern, ReplaySubject } = window.rxjs;
+    const { fromEventPattern, ReplaySubject, operators } = window.rxjs;
+    const { map } = operators;
     const source = new EventSource("http://localhost:8081/device/sse");
     const serverSentEvent$ = fromEventPattern(handlerFn => source.addEventListener("message", handlerFn));
     const rs$ = new ReplaySubject(1);
-    serverSentEvent$.subscribe(rs$);
+    serverSentEvent$
+    .pipe(map(event=> JSON.parse(event.data)))
+    .subscribe(rs$);
 
     window.addEventListener("push", event => {
         event.preventDefault();
@@ -99,4 +163,4 @@ function batteryInfoApp({rxjs, m, document }, router, observable$) {
 
     //Instantiate peer modules.
     modules.map(m=> m(window, router, rs$));
-}(window, router, [batteryInfoApp, deviceInfoApp]));
+}(window, router, [batteryInfoApp, deviceInfoApp, telemetryInfoApp]));
